@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+
+    <title>Spino</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/datatables/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/datatables/css/dataTables.bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/datatables/css/dataTables.colVis.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/spino/styles.css">
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand btn btn-link" href="/"><span class="glyphicon glyphicon-home"></span> Spino</a>
+            </div>
+            <div class="navbar-collapse collapse">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn btn-link" href="/account"><span class="glyphicon glyphicon-user"></span> Connected as {{ user['name'] }}</a>
+                    </li>
+                    {% if user['admin'] %}
+                        <li>
+                            <a class="btn btn-link" href="/admin"><span class="glyphicon glyphicon-cog"></span> Admin</a>
+                        </li>
+                    {% end %}
+                    <li>
+                        <form class="navbar-form" action="/signout" method="post">
+                            <button type="submit" class="btn btn-success">Sign out</button>
+                        </form>
+                    </li>
+                </ul>
+
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Welcome to Spino!</h1>
+            <p>A simple web application to index your ChIP-seq, RNA-seq, etc. samples.</p>
+        </div>
+    </div>
+
+    <div class="container theme-showcase">
+        <div class="page-header" id="add-header">
+            <h1>Adding a sample</h1>
+        </div>
+        <p>
+            To add a sample, click on the first panel bellow to upload the sample report,
+            then click on the second panel to fill the sample informations.<br>
+            Please note that it is impossible to add a new sample if you never uploaded any file.
+        </p>
+
+        <div class="panel-group" id="accordion">
+            <!-- File upload -->
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#panel-upload">
+                            Step #1: Upload report
+                        </a>
+                    </h4>
+                </div>
+                <div id="panel-upload" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <form id="form-upload" enctype="multipart/form-data" method="post" action="/upload">
+                            <div class="form-group">
+                                <label>Report file</label>
+                                <input name="inputfile" type="file">
+                                <span class="help-block">Must be doc, docx or pdf format.</span>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-upload"></span> Upload
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample form -->
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#panel-add">
+                            Step #2: Add your sample
+                        </a>
+                    </h4>
+                </div>
+                <div id="panel-add" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        {% if not files %}
+                            <div class="alert alert-danger">
+                                <strong>Oh snap!</strong>
+                                You do not seem to have uploaded any files.
+                            </div>
+                        {% else %}
+                            <form role="form" id="form-add">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Date of library production</label>
+                                            <input name="date" class="form-control sample-date" type="text" placeholder="Format: YYYY-MM-DD">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Sample ID</label>
+                                            <div class="form-group">
+                                                <label class="sr-only"></label>
+                                                <input name="sampleletterid" class="form-control sample-letter-id" placeholder="Enter a letter">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="sr-only"></label>
+                                                <input name="sampleid" class="form-control" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Lane usage</label>
+                                                <input name="laneusage" type="text" class="form-control" placeholder="e.g. 1/2, 2/3, 2/1, etc. (rational number must not exceed 2)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Volume submited (µL)</label>
+                                                <input name="volume" type="number" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Organism</label>
+                                                <select name="organism" class="form-control">
+                                                    <option value="">Select organism</option>
+                                                    <option>Fly</option>
+                                                    <option>Human</option>
+                                                    <option>Mouse</option>
+                                                    <option>Rat</option>
+                                                    <option>Worm</option>
+                                                    <option>Zebrafish</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Treatment</label>
+                                            <input name="treatment" type="text" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Antibody</label>
+                                            <input name="antibody" type="text" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Select report file</label>
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-default btn-sm btn-add-file">
+                                                    <span class="glyphicon glyphicon-plus-sign"></span> Join another
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-sm btn-del-file" disabled>
+                                                    <span class="glyphicon glyphicon-minus-sign"></span> Delete last
+                                                </button>
+                                            </div>
+                                            <div class="attachments">
+                                                <div class="form-group">
+                                                    <select name="file" class="form-control">
+                                                        <option value="">Select report file</option>
+                                                        {% for f in files %}
+                                                        <option value="{{ f[0] }}">{{ f[1] }}</option>
+                                                        {% end %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div> <!-- end col-md-6 -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Platform ID</label>
+                                            <input name="platformid" type="text" class="form-control" placeholder="Identification number used by the sequencing platform">
+                                        </div>
+                                        {% if user['creator'] %}
+                                        <div class="form-group">
+                                            <label>Lab member</label>
+                                            <select name="ownerid" class="form-control">
+                                                <option value="">Select lab member</option>
+                                                {% for id, u in users.items() %}
+                                                <option value="{{ id }}">{{ u['name'] }}</option>
+                                                {% end %}
+                                            </select>
+                                        </div>
+                                        {% end %}
+                                        <div class="form-group">
+                                            <label>Tapestation report position</label>
+                                            <input name="position" type="text" class="form-control" placeholder="e.g. A0, B1, C2, etc.">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Barcode</label>
+                                            <input name="barcode" type="text" class="form-control" placeholder="e.g. #1 (NEXTflex Bioo Scientific)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Application</label>
+                                            <select name="application" class="form-control">
+                                                <option value="">Select an application</option>
+                                                <option>ChIP-seq</option>
+                                                <option>FAIRE-seq</option>
+                                                <option>RNA-seq</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Cell line / tissue</label>
+                                            <input name="cellline" type="text" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Time point (hours)</label>
+                                            <input name="timepoint" type="number" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Comment</label>
+                                            <textarea name="comment" class="form-control" rows="2"></textarea>
+                                        </div>
+                                    </div> <!-- end col-md-6 -->
+                                </div> <!-- end row -->
+
+                                <p>
+                                    <button type="button" class="btn btn-default form-reset">Reset</button>
+                                    <button type="button" id="btn-add-submit" class="btn btn-primary">Submit</button>
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="alert"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        {% end %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Samples</h1>
+        </div>
+        <p>
+            If you are allowed to do, you can change the status of your samples
+            by selecting one or more samples and pressing one of the buttons bellow.
+        </p>
+
+        <div id="spino-btn">
+            <button id="btn-waiting" class="btn" type="button">Waiting for approval</button>
+            <button id="btn-queue" class="btn" type="button">In queue</button>
+            <button id="btn-sequencing" class="btn" type="button">Sequencing</button>
+            <button id="btn-sequenced" class="btn" type="button">Sequenced</button>
+            <button id="btn-archived" class="btn" type="button">Archived</button>
+        </div>
+        <!--<p>
+            <button class="btn btn-waiting" type="button">Waiting for approval</button>
+            <button class="btn btn-queue" type="button">In queue</button>
+            <button class="btn btn-sequencing" type="button">Sequencing</button>
+            <button class="btn btn-sequenced" type="button">Sequenced</button>
+            <button class="btn btn-archived" type="button">Archived</button>
+        </p>-->
+
+        <form id="samples">
+            <table id="table-samples" class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>ID</th>
+                    <th>Platform&nbsp;ID</th>
+                    <th>Report</th>
+                    <th>Users</th>
+                    <th>Position</th>
+                    <th>Lane&nbsp;usage</th>
+                    <th>Barcode</th>
+                    <th>Volume&nbsp;(µL)</th>
+                    <th>Application</th>
+                    <th>Organism</th>
+                    <th>Tissue/cell&nbsp;line</th>
+                    <th>Treatment</th>
+                    <th>Time&nbsp;point&nbsp;(h)</th>
+                    <th>Antibody</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                    <th>Edit</th>
+                </tr>
+
+                </thead>
+                <tbody>
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Select</th>
+                    <th>ID</th>
+                    <th>Platform&nbsp;ID</th>
+                    <th>Report</th>
+                    <th>Users</th>
+                    <th>Position</th>
+                    <th>Lane&nbsp;usage</th>
+                    <th>Barcode</th>
+                    <th>Volume&nbsp;(µL)</th>
+                    <th>Application</th>
+                    <th>Organism</th>
+                    <th>Tissue/cell&nbsp;line</th>
+                    <th>Treatment</th>
+                    <th>Time&nbsp;point&nbsp;(h)</th>
+                    <th>Antibody</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                    <th>Edit</th>
+                </tr>
+                </tfoot>
+
+            </table>
+        </form>
+
+        <!-- Comment modal -->
+        <div class="modal fade" id="modal-comment" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Comment</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form">
+                            <textarea style="resize: none" class="form-control" rows="2" readonly></textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit sample modal -->
+        <div class="modal fade" id="modal-edit" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Edit sample</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" id="form-edit">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="hidden" name="realid" value="">
+                                    <div class="form-group">
+                                        <label>Date of library production</label>
+                                        <input name="date" class="form-control" type="text" placeholder="Format: YYYY-MM-DD">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sample ID</label>
+                                        <div class="form-group">
+                                            <label class="sr-only"></label>
+                                            <input name="sampleletterid" class="form-control" placeholder="Enter a letter">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only"></label>
+                                            <input name="sampleid" class="form-control" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Lane usage</label>
+                                            <input name="laneusage" type="text" class="form-control" placeholder="e.g. 1/2, 2/3, 2/1, etc. (rational number must not exceed 2)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Volume submited (µL)</label>
+                                            <input name="volume" type="number" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Organism</label>
+                                            <select name="organism" class="form-control">
+                                                <option value="">Select organism</option>
+                                                <option>Fly</option>
+                                                <option>Human</option>
+                                                <option>Mouse</option>
+                                                <option>Rat</option>
+                                                <option>Worm</option>
+                                                <option>Zebrafish</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Treatment</label>
+                                        <input name="treatment" type="text" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Antibody</label>
+                                        <input name="antibody" type="text" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Select attachment(s)</label>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-default btn-sm btn-add-file">
+                                                <span class="glyphicon glyphicon-plus-sign"></span> Join another
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-sm btn-del-file" disabled>
+                                                <span class="glyphicon glyphicon-minus-sign"></span> Delete last
+                                            </button>
+                                        </div>
+                                        <div class="attachments">
+                                            <div class="form-group">
+                                                <select name="file" class="form-control">
+                                                    <option value="">Select attachment(s)</option>
+                                                    {% for f in files %}
+                                                    <option value="{{ f[0] }}">{{ f[1] }}</option>
+                                                    {% end %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div> <!-- end col-md-6 -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Platform ID</label>
+                                        <input name="platformid" type="text" class="form-control" placeholder="Identification number used by the sequencing platform">
+                                    </div>
+                                    {% if user['creator'] %}
+                                    <div class="form-group">
+                                        <label>Lab member</label>
+                                        <select name="ownerid" class="form-control">
+                                            <option value="">Select lab member</option>
+                                            {% for id, u in users.items() %}
+                                            <option value="{{ id }}">{{ u['name'] }}</option>
+                                            {% end %}
+                                        </select>
+                                    </div>
+                                    {% end %}
+                                    <div class="form-group">
+                                        <label>Tapestation report position</label>
+                                        <input name="position" type="text" class="form-control" placeholder="e.g. A0, B1, C2, etc.">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Barcode</label>
+                                        <input name="barcode" type="text" class="form-control" placeholder="e.g. #1 (NEXTflex Bioo Scientific)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Application</label>
+                                        <select name="application" class="form-control">
+                                            <option value="">Select an application</option>
+                                            <option>ChIP-seq</option>
+                                            <option>FAIRE-seq</option>
+                                            <option>RNA-seq</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Cell line / tissue</label>
+                                        <input name="cellline" type="text" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Time point (hours)</label>
+                                        <input name="timepoint" type="number" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Comment</label>
+                                        <textarea name="comment" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="alert"></div>
+                                </div> <!-- end col-md-6 -->
+                            </div> <!-- end row -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="btn-edit-delete">Delete</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="btn-edit-submit">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attachments modal -->
+        <div class="modal fade" id="show-links-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog sm-modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Attachments</h4>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+
+    {% include footer.html %}
+
+    {% if user['creator'] %}
+        <script type="text/javascript">
+            var spinoCreator = true;
+        </script>
+    {% else %}
+        <script type="text/javascript">
+            var spinoCreator = false;
+        </script>
+    {% end %}
+
+    <script type="text/javascript" language="javascript" src="/static/spino/functions.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/datatables/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/datatables/js/dataTables.bootstrap.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/datatables/js/dataTables.colVis.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/datatables/js/fnSetFilteringDelay.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/spino/table.js"></script>
+
+    <script type="text/javascript" language="javascript" src="/static/jquery.validate.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/static/spino/forms.js"></script>
+
+
+
+</body>
+</html>

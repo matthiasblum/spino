@@ -1,0 +1,129 @@
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+.jumbotron {
+    background: #2897BA;
+    /*background-image: url("/static/spino/ecailles.png");*/
+    color: #ffffff;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+#samples_wrapper {
+    margin-bottom: 50px;
+}
+
+.btn-waiting {
+    background-color: #EBEBEB;
+    /*border-color: #CCCCCC;*/
+}
+
+#spino-btn > button {
+    color: #fff;
+}
+
+.btn-queue {
+    background-color: #FFB854;
+    /*border-color: #E38D13;*/
+}
+
+.btn-sequencing {
+    background-color: #6BD9EC;
+    /*border-color: #28A4C9;*/
+}
+
+.btn-sequenced {
+    background-color: #72D672;
+    /*border-color: #3E8F3E;*/
+}
+
+.btn-archived {
+    background-color: #1ABC9C;
+    /* #EC7063*/
+}
+
+.navbar-inverse label {
+    color: #999999;
+}
+
+.table > tbody > tr > td > input {
+    margin: 0;
+}
+
+div.clear {
+    clear: both;
+    float: none !important;
+    height: 0;
+    width: 100%;
+}
+
+/*
+Since a lot of things are messed up if we removed the datatables css file,
+we need to fix the shits it does to the bootstrap pagination
+*/
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button:active {
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+    border: none;
+}
+
+.dataTable > thead > tr > th, .dataTable > tbody > tr > td, .dataTable > tfoot > tr > th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.dataTable > tbody > tr > td {
+    color: #fff;
+}
+
+.dataTable td > a {
+    color: #fff;
+}
+
+.dataTable a:hover, .dataTable a:focus {
+    text-decoration: underline;
+}
+
+.dataTable .btn-link {
+    color: #fff;
+}
+
+#form-addsample .alert {
+    display: none;
+}
+
+.sm-modal-dialog {
+    width: 400px;
+}
+
+/*
+    We added the tr.class > td because of DataTables' ColVis.
+    If a column is hidden, tds do not get the background-color.
+    To fix this, we apply the class to the row (tr)
+*/
+.buttercup, tr.buttercup > td { background-color: #F0B549; }
+.wisteria, tr.wisteria > td { background-color: #9b59b6; }
+.curious-blue, tr.curious-blue > td { background-color: #3498db; }
+.shamrock, tr.shamrock > td { background-color: #2ecc71; }
+.blue-dianne, tr.blue-dianne > td { background-color: #284A5B; }
+
+button.buttercup:hover, button.buttercup:active { background-color: #da9412; }
+button.wisteria:hover, button.wisteria:active { background-color: #713b87; }
+button.curious-blue:hover, button.curious-blue:active { background-color: #1d6fa5; }
+button.shamrock:hover, button.shamrock:active { background-color: #208e4e; }
+button.blue-dianne:hover, button.blue-dianne:active { background-color: #3f7590; }
+
+

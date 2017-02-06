@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/spino/styles.css">
+    <title>Account - Spino</title>
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand btn btn-link" href="/"><span class="glyphicon glyphicon-home"></span> Spino</a>
+            </div>
+            <div class="navbar-collapse collapse">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn btn-link" href="/account"><span class="glyphicon glyphicon-user"></span> Connected as {{ user['name'] }}</a>
+                    </li>
+                    {% if user['admin'] %}
+                        <li>
+                            <a class="btn btn-link" href="/admin"><span class="glyphicon glyphicon-cog"></span> Admin</a>
+                        </li>
+                    {% end %}
+                    <li>
+                        <form class="navbar-form" action="/signout" method="post">
+                            <button type="submit" class="btn btn-success">Sign out</button>
+                        </form>
+                    </li>
+                </ul>
+
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="container theme-showcase">
+        <div class="page-header">
+            <h1>Account</h1>
+        </div>
+
+        {% if alert %}
+            <div class="alert {{ alert['class'] }}">
+                <strong>{{ alert['title'] }}</strong>
+                {{ alert['text'] }}
+            </div>
+        {% end %}
+
+        <h3>Password</h3>
+        <form class="form-horizontal" role="form" action="/account" method="post">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Email</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static">{{ user['email'] }}</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" name="password" class="form-control" placeholder="Password" value="{{ passwd }}" required="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Password confirmation</label>
+                <div class="col-sm-10">
+                    <input type="password" name="password2" class="form-control" placeholder="Password confirmation" value="{{ passwd2 }}" required="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Change password</button>
+                </div>
+            </div>
+        </form>
+
+        <h3>Uploads</h3>
+        {% if files %}
+            <p>Please note that you cannot delete used files.</p>
+            <form role="form" method="post" action="/account">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Uploaded</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for f in files %}
+                        <tr>
+                            <td><a href="/files/{{ f[1] }}">{{ f[2] }}</a></td>
+                            <td>{{ f[3] }}</td>
+                            <td>
+                                <input name="file" type="checkbox" value="{{ f[0] }}" {% if f[4] %}disabled{% end %}>
+                            </td>
+                        </tr>
+                    {% end %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-warning">Delete</button>
+            </form>
+        {% else %}
+            <p>You do not have uploaded any file.</p>
+        {% end %}
+    </div>
+
+    {% include footer.html %}
+
+</body>
+</html>

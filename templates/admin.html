@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/spino/styles.css">
+    <title>Account - Spino</title>
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand btn btn-link" href="/"><span class="glyphicon glyphicon-home"></span> Spino</a>
+            </div>
+            <div class="navbar-collapse collapse">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn btn-link" href="/account"><span class="glyphicon glyphicon-user"></span> Connected as {{ user['name'] }}</a>
+                    </li>
+                    <li>
+                        <a class="btn btn-link" href="/admin"><span class="glyphicon glyphicon-cog"></span> Admin</a>
+                    </li>
+                    <li>
+                        <form class="navbar-form" action="/signout" method="post">
+                            <button type="submit" class="btn btn-success">Sign out</button>
+                        </form>
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="container theme-showcase">
+        <div class="page-header">
+            <h1>Administration panel</h1>
+        </div>
+
+        {% if alert %}
+            <div class="alert alert-{{ alert[0] }}">
+                {{ alert[1] }}
+            </div>
+
+        {% end %}
+
+        <h3>New account</h3>
+        <form class="form-horizontal" role="form" action="/admin/add" method="post">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" name="email" class="form-control" placeholder="Email" value="{{ email }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-10">
+                    <input type="text" name="name" class="form-control" placeholder="Name" value="{{ name }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" name="password" class="form-control" placeholder="Password" value="{{ passwd }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Password confirmation</label>
+                <div class="col-sm-10">
+                    <input type="password" name="password2" class="form-control" placeholder="Password confirmation" value="{{ passwd2 }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                        <label>
+                            <input name="is_creator" type="checkbox" value="1"> Can add samples for others and leave fields empty.
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                        <label>
+                            <input name="is_leader" type="checkbox" value="1"> Can approve samples for sequencing.
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                        <label>
+                            <input name="is_admin" type="checkbox" value="1"> Can create accounts.
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Create account</button>
+                </div>
+            </div>
+        </form>
+
+        <h3>Existing accounts</h3>
+        <form role="form" method="post" action="/admin/manage">
+            <button type="submit" class="btn btn-warning">Save changes</button>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Created on</th>
+                    <th>Last connection</th>
+                    <th>Creator</th>
+                    <th>Leader</th>
+                    <th>Admin</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for id, u in users.items() %}
+                    <tr>
+                        <td>{{ u['name'] }}</td>
+                        <td>{{ u['email'] }}</td>
+                        <td>{{ u['created'] }}</td>
+                        <td>{{ u['last_connection'] }}</td>
+                        <td>
+                            <input name="creator" type="checkbox" value="{{ id }}" {%if u['creator']%}checked{%end%}>
+                        </td>
+                        <td>
+                            <input name="leader" type="checkbox" value="{{ id }}" {%if u['leader']%}checked{%end%}>
+                        </td>
+                        <td>
+                            <input name="admin" type="checkbox" value="{{ id }}" {%if u['admin']%}checked{%end%}>
+                        </td>
+                    </tr>
+                {% end %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    {% include footer.html %}
+
+</body>
+</html>
