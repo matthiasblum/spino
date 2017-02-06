@@ -2,7 +2,9 @@
 
 A micro sequencing libraries management system.
 
-Spino runs with Python2 and requires the MySQLdb and tornado packages.
+## Running Spino
+
+Spino requires Python2 and the MySQLdb and tornado packages.
 
 The `config.py` file has to be modified to define the directory of uploaded files (TapeStation reports, etc.).
 
